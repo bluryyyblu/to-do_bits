@@ -1,0 +1,30 @@
+{
+  "name": "bunny-tasks",
+  "version": "1.0.0",
+  "description": "A super cute productivity app",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.example.bunnytasks",
+    "productName": "BunnyTasks",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/bunny-icon.png"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/bunny-icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/bunny-icon.png"
+    }
+  },
+  "devDependencies": {
+    "electron": "^latest",
+    "electron-builder": "^latest"
+  }
+}

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do Bits ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="icon" type="image/png" href="D:\SIMRAN\Web\prod\flower.png">
+  <style>
+    :root {
+      --pink: #FFB6C1;
+      --pink-dark: #FF69B4;
+      --purple: #D8BFD8;
+      --blue: #ADD8E6;
+      --yellow: #FFFACD;
+    }
+
+    body {
+      font-family: 'Comic Neue', cursive;
+      background-color: #FFF5F7;
+      margin: 0;
+      padding: 20px;
+      color: #5E5E5E;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: var(--pink-dark);
+      margin: 0;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+      text-align: center;
+      flex: 1;
+    }
+
+    .bunny {
+      font-size: 2em;
+      margin-right: 15px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .task-input {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .task-input input {
+      flex: 1;
+      padding: 12px 15px;
+      border: none;
+      border-radius: 30px;
+      font-family: 'Comic Neue', cursive;
+      font-size: 1.1em;
+      background-color: white;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-right: 10px;
+    }
+
+    .task-input button {
+      background-color: var(--pink);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      color: white;
+      font-size: 1.5em;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+
+    .task-input button:hover {
+      background-color: var(--pink-dark);
+      transform: scale(1.1);
+    }
+
+    .task-list {
+      background-color: white;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #F0F0F0;
+      transition: all 0.3s;
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+    }
+
+    .task-item:hover {
+      background-color: var(--yellow);
+      border-radius: 15px;
+    }
+
+    .task-checkbox {
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      border: 2px solid var(--pink);
+      border-radius: 50%;
+      margin-right: 15px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .task-checkbox:checked {
+      background-color: var(--pink);
+    }
+
+    .task-checkbox:checked::after {
+      content: '✓';
+      position: absolute;
+      color: white;
+      font-size: 1.2em;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 1.2em;
+    }
+
+    .task-checkbox:checked + .task-text {
+      text-decoration: line-through;
+      color: #AAA;
+    }
+
+    .task-delete {
+      background: none;
+      border: none;
+      color: #FF6B6B;
+      font-size: 1.2em;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    .task-item:hover .task-delete {
+      opacity: 1;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+      background-color: var(--blue);
+      padding: 15px;
+      border-radius: 20px;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .stats div {
+      flex: 1;
+    }
+
+    .stats span {
+      display: block;
+      font-size: 1.8em;
+    }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: var(--pink);
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="bunny">🐰</div>
+      <h1>To-Do Bits</h1>
+    </header>
+
+    <div class="task-input">
+      <input type="text" id="new-task" placeholder="Add a new task..." autofocus>
+      <button id="add-task"><i class="fas fa-plus"></i></button>
+    </div>
+
+    <div class="task-list" id="task-list">
+      <!-- Tasks will be added here -->
+    </div>
+
+    <div class="stats">
+      <div>
+        <span id="total-tasks">0</span>
+        Total Tasks
+      </div>
+      <div>
+        <span id="completed-tasks">0</span>
+        Completed
+      </div>
+      <div>
+        <span id="remaining-tasks">0</span>
+        Remaining
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const taskInput = document.getElementById('new-task');
+      const addTaskBtn = document.getElementById('add-task');
+      const taskList = document.getElementById('task-list');
+      const totalTasksSpan = document.getElementById('total-tasks');
+      const completedTasksSpan = document.getElementById('completed-tasks');
+      const remainingTasksSpan = document.getElementById('remaining-tasks');
+
+      let tasks = JSON.parse(localStorage.getItem('bunny-tasks')) || [];
+
+      function renderTasks() {
+        taskList.innerHTML = '';
+        tasks.forEach((task, index) => {
+          const taskItem = document.createElement('div');
+          taskItem.className = 'task-item';
+
+          taskItem.innerHTML = `
+            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} data-index="${index}">
+            <div class="task-text">${task.text}</div>
+            <button class="task-delete" data-index="${index}"><i class="fas fa-trash"></i></button>
+          `;
+
+          taskList.appendChild(taskItem);
+        });
+
+        updateStats();
+      }
+
+      function updateStats() {
+        const total = tasks.length;
+        const completed = tasks.filter(task => task.completed).length;
+        const remaining = total - completed;
+
+        totalTasksSpan.textContent = total;
+        completedTasksSpan.textContent = completed;
+        remainingTasksSpan.textContent = remaining;
+
+        // Bunny reaction based on completion
+        const bunny = document.querySelector('.bunny');
+        if (completed === total && total > 0) {
+          bunny.textContent = '🎉';
+          createConfetti();
+        } else if (completed / total > 0.5) {
+          bunny.textContent = '🐇';
+        } else {
+          bunny.textContent = '🐰';
+        }
+
+        localStorage.setItem('bunny-tasks', JSON.stringify(tasks));
+      }
+
+      function createConfetti() {
+        for (let i = 0; i < 50; i++) {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.backgroundColor = getRandomColor();
+          confetti.style.opacity = '0.8';
+          confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+          document.body.appendChild(confetti);
+
+          // Animation
+          setTimeout(() => {
+            confetti.style.top = '-10px';
+            confetti.style.opacity = '0';
+            confetti.style.transition = 'all 1s';
+
+            setTimeout(() => {
+              confetti.remove();
+            }, 1000);
+          }, 10);
+        }
+      }
+
+      function getRandomColor() {
+        const colors = ['#FFB6C1', '#FF69B4', '#D8BFD8', '#ADD8E6', '#FFFACD'];
+        return colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      // Add new task
+      addTaskBtn.addEventListener('click', () => {
+        const text = taskInput.value.trim();
+        if (text) {
+          tasks.push({ text, completed: false });
+          taskInput.value = '';
+          renderTasks();
+        }
+      });
+
+      taskInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          addTaskBtn.click();
+        }
+      });
+
+      // Toggle task completion
+      taskList.addEventListener('change', (e) => {
+        if (e.target.classList.contains('task-checkbox')) {
+          const index = e.target.dataset.index;
+          tasks[index].completed = e.target.checked;
+          renderTasks();
+        }
+      });
+
+      // Delete task
+      taskList.addEventListener('click', (e) => {
+        if (e.target.classList.contains('task-delete') || 
+            e.target.parentElement.classList.contains('task-delete')) {
+          const index = e.target.dataset.index || 
+                       e.target.parentElement.dataset.index;
+          tasks.splice(index, 1);
+          renderTasks();
+        }
+      });
+
+      // Initial render
+      renderTasks();
+    });
+  </script>
+</body>
+</html>
